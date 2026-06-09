@@ -55,7 +55,7 @@ variable "lambda3_zip_path" {
 variable "db_host" {
   description = "PostgreSQL host"
   type        = string
-  default     = "localhost"
+    default     = "simple-project-postgres-1"
 }
 
 variable "db_port" {
