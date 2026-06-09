@@ -1,0 +1,42 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go
+lambdas/lambda1/bootstrap
+lambdas/lambda1/main
+lambdas/lambda2/bootstrap
+lambdas/lambda2/main
+lambdas/lambda1/vendor/
+lambdas/lambda2/vendor/
+
+# Python
+lambdas/lambda3/__pycache__/
+lambdas/lambda3/*.zip
+lambdas/lambda3/venv/
+*.pyc
+
+# Terraform / OpenTofu
+*.tfstate
+*.tfstate.*
+.terraform/
+*.terraform.lock.hcl
+
+# Local
+.env
+.env.local
+fitnesse-wiki/

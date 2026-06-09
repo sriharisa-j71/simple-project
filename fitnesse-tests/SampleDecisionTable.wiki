@@ -1,0 +1,59 @@
+!1 End-to-End Event-Driven Test
+
+!2 Prerequisites
+
+Ensure the local environment is running (docker-compose up) and
+OpenTofu has been applied (infra/ directory).
+
+!2 Imports
+
+| import |
+| com.example.fixtures |
+
+!2 Option A: Publish Raw JSON via SqsPublishFixture
+
+| script        | SqsPublishFixture                                                         |
+| setQueueUrl   | http://localhost:4566/000000000000/event-ingress-queue                    |
+| setMessageBody | {"id":"txn-001","amount":49.99,"description":"test purchase","timestamp":"2025-01-01T00:00:00Z"} |
+| $messageId=   | publish                                                                   |
+
+!2 Option B: Publish via JteTemplate (JTE-generated SQS event)
+
+| script          | JteSqsPublishFixture                                                    |
+| setQueueUrl     | http://localhost:4566/000000000000/event-ingress-queue                  |
+| setTransactionId| txn-002                                                                 |
+| setAmount       | 149.99                                                                  |
+| setDescription  | JTE-generated purchase                                                  |
+| $messageId2=    | publish                                                                 |
+
+!3 Verify Lambda 1 (SQS -> S3) via CloudWatch Logs
+
+| script          | CloudWatchLogsFixture                               |
+| setLogGroupName | /aws/lambda/sqs-to-s3-processor                     |
+| setFilterPattern | "Successfully wrote event"                          |
+| check           | logContains                                         | $messageId  |
+| check           | logContains                                         | $messageId2 |
+| show            | matchingMessages                                    |
+
+!3 Verify Lambda 2 (S3 -> DB) via CloudWatch Logs
+
+| script          | CloudWatchLogsFixture                               |
+| setLogGroupName | /aws/lambda/s3-to-db-loader                         |
+| setFilterPattern | "Successfully inserted transaction"                 |
+| check           | logContains                                         | txn-001     |
+| check           | logContains                                         | txn-002     |
+| show            | matchingMessages                                    |
+
+!3 Verify Record in PostgreSQL
+
+| script  | ExistsInDB          |
+| setTable| transactions        |
+| setColumn| id                  |
+| check   | exists              | txn-001 |
+| check   | exists              | txn-002 |
+
+!3 Health Check via HTTP
+
+| script | FetchByHttpGetCall                |
+| setUrl | http://localhost:4566/_localstack/health |
+| show   | statusCode                        |
