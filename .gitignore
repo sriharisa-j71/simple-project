@@ -42,5 +42,8 @@ lambdas/lambda3/venv/
 .env.local
 fitnesse-wiki/
 
+# JTE generated classes
+jte-classes/
+
 # Generated archives
 *.zip
