@@ -4,6 +4,7 @@ import com.example.common.JteTemplateEngine;
 import com.example.common.models.BankAccount;
 import com.example.common.models.Person;
 import com.example.common.models.Transaction;
+import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
@@ -56,7 +57,8 @@ public class DomainTemplatePreviewFixture {
             transactionId, amount, description, timestamp, bankAccount, merchant
         );
         var body = jte.renderDomainTransaction(transaction);
+        var escapedBody = new String(JsonStringEncoder.getInstance().quoteAsString(body));
         var messageId = UUID.randomUUID().toString();
-        return jte.renderDomainSqsEvent(messageId, body, timestamp);
+        return jte.renderDomainSqsEvent(messageId, escapedBody, timestamp);
     }
 }

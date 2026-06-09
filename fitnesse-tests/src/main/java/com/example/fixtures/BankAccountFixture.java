@@ -34,6 +34,8 @@ public class BankAccountFixture {
     public String render() throws Exception {
         var person = mapper.readValue(accountHolderJson, Person.class);
         var account = new BankAccount(accountNumber, person, balance, accountType);
-        return jte.renderBankAccount(account);
+        var json = jte.renderBankAccount(account);
+        var tree = mapper.readTree(json);
+        return mapper.writeValueAsString(tree);
     }
 }
