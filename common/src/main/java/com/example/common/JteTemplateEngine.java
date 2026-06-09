@@ -1,5 +1,8 @@
 package com.example.common;
 
+import com.example.common.models.BankAccount;
+import com.example.common.models.Person;
+import com.example.common.models.Transaction;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.TemplateOutput;
@@ -63,6 +66,26 @@ public final class JteTemplateEngine {
             "bucketName", bucketName,
             "objectKey", objectKey,
             "eventTime", eventTime
+        ));
+    }
+
+    public String renderPerson(Person person) {
+        return render("person.jte", Map.of("person", person));
+    }
+
+    public String renderBankAccount(BankAccount bankAccount) {
+        return render("bankaccount.jte", Map.of("bankAccount", bankAccount));
+    }
+
+    public String renderDomainTransaction(Transaction transaction) {
+        return render("domain_transaction.jte", Map.of("transaction", transaction));
+    }
+
+    public String renderDomainSqsEvent(String messageId, String body, String timestamp) {
+        return render("domain_sqs_event.jte", Map.of(
+            "messageId", messageId,
+            "body", body,
+            "timestamp", timestamp
         ));
     }
 }
