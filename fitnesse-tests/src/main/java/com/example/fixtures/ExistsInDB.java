@@ -17,6 +17,10 @@ public class ExistsInDB {
     }
 
     public boolean exists(String value) {
-        return db.recordExists(table, column, value);
+        for (int i = 0; i < 10; i++) {
+            if (db.recordExists(table, column, value)) return true;
+            try { Thread.sleep(2000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); break; }
+        }
+        return false;
     }
 }

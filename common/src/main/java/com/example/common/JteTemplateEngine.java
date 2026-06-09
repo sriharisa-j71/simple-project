@@ -42,7 +42,7 @@ public final class JteTemplateEngine {
     }
 
     public String renderSqsEvent(String messageId, String body, String timestamp) {
-        return render("sqsevent", Map.of(
+        return render("sqsevent.jte", Map.of(
             "messageId", messageId,
             "body", body,
             "timestamp", timestamp
@@ -50,7 +50,7 @@ public final class JteTemplateEngine {
     }
 
     public String renderTransaction(String id, double amount, String description, String timestamp) {
-        return render("transaction", Map.of(
+        return render("transaction.jte", Map.of(
             "id", id,
             "amount", amount,
             "description", description,
@@ -59,7 +59,7 @@ public final class JteTemplateEngine {
     }
 
     public String renderS3Notification(String bucketName, String objectKey, String eventTime) {
-        return render("s3notification", Map.of(
+        return render("s3notification.jte", Map.of(
             "bucketName", bucketName,
             "objectKey", objectKey,
             "eventTime", eventTime
