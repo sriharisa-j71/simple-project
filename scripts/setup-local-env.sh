@@ -68,9 +68,13 @@ cat > "$WIKI_DIR/FitNesseRoot/content.txt" << 'WIKI'
 
 !2 Test Suites
 
-* Decision Table: SQS -> Lambda 1 -> S3 -> Lambda 2 -> DB
+* SimpleProjectTest — End-to-end test: SQS publish → Lambda → CloudWatch logs → PostgreSQL
 
-!contents
+!2 Prerequisites
+
+Ensure the local environment is running (docker compose up) and OpenTofu has been applied.
+
+!contents -R -g -p -f
 WIKI
 
 echo ""

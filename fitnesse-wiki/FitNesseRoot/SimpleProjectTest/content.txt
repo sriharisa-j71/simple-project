@@ -1,0 +1,95 @@
+!define TEST_SYSTEM {slim}
+
+!1 End-to-End Event-Driven Test Suite
+
+!2 Imports
+
+| import                                   |
+| com.example.fixtures                     |
+
+!2 Option A: Publish Raw JSON
+
+| script       | com.example.fixtures.SqsPublishFixture         |
+| setQueueUrl  | event-ingress-queue |
+| setMessageBody | {"id":"txn-001","amount":49.99,"description":"test purchase","timestamp":"2025-01-01T00:00:00Z"} |
+| $mid=        | publish                                         |
+
+!2 Option B: Publish via JTE template
+
+| script         | com.example.fixtures.JteSqsPublishFixture     |
+| setQueueUrl    | event-ingress-queue |
+| setTransactionId | txn-002                                     |
+| setAmount      | 149.99                                         |
+| setDescription | JTE-generated purchase                          |
+| $mid2=         | publish                                        |
+
+!2 Option C: Domain Model Composition via Symbols
+
+Build a nested object structure by composing Person -> BankAccount -> Transaction
+through FitNesse symbols, then render via JTE templates.
+
+| script | com.example.fixtures.PersonFixture |
+| setName | Alice |
+| setEmail | alice@example.com |
+| setAge | 30 |
+| $person= | render |
+
+| script | com.example.fixtures.BankAccountFixture |
+| setAccountNumber | ACC-001 |
+| setAccountHolder | $person |
+| setBalance | 5000.00 |
+| setAccountType | CHECKING |
+| $account= | render |
+
+| script | com.example.fixtures.DomainTemplatePreviewFixture |
+| setTransactionId | TXN-DOMAIN-003 |
+| setAmount | 250.00 |
+| setDescription | Online payment via nested domain models |
+| setMerchant | Amazon |
+| setAccount | $account |
+| show | renderedTransaction |
+| show | renderedSqsEvent |
+
+| script | com.example.fixtures.DomainJteSqsPublishFixture |
+| setQueueUrl | event-ingress-queue |
+| setTransactionId | TXN-DOMAIN-004 |
+| setAmount | 125.50 |
+| setDescription | Published nested domain event |
+| setMerchant | eBay |
+| setAccount | $account |
+| $mid3= | publish |
+
+!3 Verify Lambda 1 logs
+
+| script          | com.example.fixtures.CloudWatchLogsFixture    |
+| setLogGroupName | /aws/lambda/sqs-to-s3-processor                |
+| setFilterPattern | successfully wrote event                      |
+| check           | logContains                                   | $mid  | true |
+| check           | logContains                                   | $mid2 | true |
+| check           | logContains                                   | $mid3 | true |
+| show            | matchingMessages                               |
+
+!3 Verify Lambda 2 logs
+
+| script          | com.example.fixtures.CloudWatchLogsFixture    |
+| setLogGroupName | /aws/lambda/s3-to-db-loader                    |
+| setFilterPattern | inserted transaction                            |
+| check           | logContains                                   | txn-001 | true |
+| check           | logContains                                   | txn-002 | true |
+| check           | logContains                                   | TXN-DOMAIN-004 | true |
+| show            | matchingMessages                               |
+
+!3 Verify PostgreSQL
+
+| script | com.example.fixtures.ExistsInDB |
+| setTable | transactions |
+| setColumn | id |
+| check | exists | txn-001 | true |
+| check | exists | txn-002 | true |
+| check | exists | TXN-DOMAIN-004 | true |
+
+!3 Health Check
+
+| script  | com.example.fixtures.FetchByHttpGetCall |
+| setUrl  | !-http://localhost:4566/_localstack/health-! |
+| show    | statusCode |

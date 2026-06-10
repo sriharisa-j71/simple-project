@@ -40,7 +40,6 @@ lambdas/lambda3/venv/
 # Local
 .env
 .env.local
-fitnesse-wiki/
 
 # JTE generated classes
 jte-classes/

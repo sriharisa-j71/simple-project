@@ -1,0 +1,10 @@
+# Maven build output
+target/
+
+# Shade plugin generates this
+dependency-reduced-pom.xml
+
+# FitNesse runtime
+*.log
+FitNesseUsage.log*
+error.log*

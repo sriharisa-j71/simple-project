@@ -105,7 +105,7 @@ cd fitnesse-tests && mvn exec:java \
   -Dexec.args="-p 9090 -d ../fitnesse-wiki"
 ```
 
-Open http://localhost:9090 and run the `SampleDecisionTable` suite.
+Open http://localhost:9090 and run the `SimpleProjectTest` suite.
 
 The wiki provides decision tables for:
 - Publishing events to SQS (raw JSON or JTE-generated)
